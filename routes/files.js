@@ -2,20 +2,12 @@ import express from 'express';
 import fs from 'fs/promises';
 import path from 'path';
 import { safePath, STORAGE_ROOT } from '../utils/safePath.js';
+import { handleError } from '../utils/errors.js';
+import multer from 'multer';
+
 
 const router = express.Router();
 
-// Handles try catch errors
-function handleError(err, res) {
-  if (err.message === 'Invalid path' || err.message === 'Invalid name')
-    return res.status(400).json({ error: err.message });
-  if (err.code === 'ENOENT')
-    return res.status(404).json({ error: 'Not found' });
-  if (err.code === 'EEXIST' || err.code === 'ENOTEMPTY')
-    return res.status(409).json({ error: 'Already exists or not empty' });
-  console.error(err);
-  res.status(500).json({ error: 'Server error' });
-}
 
 // Makes sure the name is usable
 function validateName(name) {
@@ -35,6 +27,68 @@ async function exists(p) {
     throw err; 
   }
 }
+
+// Finding the file a unique name using a (number / index) system 
+async function uniqueName(dir, name) {
+  const ext = path.extname(name);
+  const base = path.basename(name, ext);
+  let candidate = name;
+  let i = 1;
+  while (await exists(path.join(dir,candidate))){
+    candidate = `${base} (${i})${ext}` // name (i).ext
+    i++;
+  }
+  return candidate;
+}
+
+const storage = multer.diskStorage({
+  async destination(req, file, cb){
+    try {
+      const dir = safePath(req.query.body);
+      const info = await fs.stat(dir);
+      if (!info.isDirectory()) throw new Error('Invalid path');
+      cb(null, dir); // saves here
+    } catch (error) {
+      cb(error)
+    }
+  },
+  async filename(req,file,cb){
+    try {
+      const dir = safePath(req.query.path);
+      const clean = validateName(path.basename(file.originalname));
+      cb(null, await uniqueName(dir, clean)); // names the file
+    } catch (error) {
+      cb(error);
+    }
+  },
+});
+
+const upload = multer({storage});
+
+// POST upload files
+router.post('/upload', upload.array('files'), (req,res) =>{
+  if (!req.files || req.files.length === 0){
+    return res.status(400).json({error: ' No files uploaded'});
+  }
+  res.status(201).json({upload: req.files.map((f) => f.filename)});
+})
+
+// GET download files
+router.get('/download', async (req,res) =>{
+  try {
+    const target = safePath(req.query.body);
+    const info = await fs.stat(target);
+    if (info.isDirectory()){
+      return res.status(400).json({error: 'Canot download a folder'});
+    }
+    res.download(target, (err) => {
+      if (err && !res.headersSent) handleError(err, res);
+    });
+    
+  } catch (error) {
+    handleError(error, res);
+  }
+});
 
 // GET files in specific path OR storage dir
 router.get('/files', async (req, res) => {
@@ -61,7 +115,7 @@ router.get('/files', async (req, res) => {
 });
 
 // POST creates a folder
-// Body: { "path": "docs", "name": "School" }
+// Exp: Body: { "path": "docs", "name": "School" }
 router.post('/folders', async (req,res) => {
     try {
         const parent = safePath(req.body.path);
