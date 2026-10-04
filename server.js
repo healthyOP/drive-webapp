@@ -3,7 +3,7 @@ import path from 'path';
 import filesRouter from './routes/files.js';
 import fs from 'fs/promises';
 import { STORAGE_ROOT } from './utils/safePath.js';
-import { handleError } from '../utils/errors.js';
+import { handleError } from './utils/errors.js';
 
 // Creates only if storage folder doesn't exist (for example after downloading from GitHub)
 await fs.mkdir(STORAGE_ROOT, { recursive: true }); 
