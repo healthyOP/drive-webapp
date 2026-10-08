@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Drive</title>
+
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+</head>
+
+<!-- File Preview Modal -->
+<div id="preview-modal" class="preview-modal hidden">
+    <div class="preview-overlay"></div>
+
+    <div class="preview-window">
+        <div class="preview-header">
+            <div id="preview-title" class="preview-title"></div>
+
+            <div class="preview-actions">
+                <button id="preview-download" class="preview-button">
+                    ↓ Download
+                </button>
+
+                <button id="preview-close" class="preview-close">
+                    ×
+                </button>
+            </div>
+        </div>
+
+        <div id="preview-content" class="preview-content">
+            <div class="preview-loading">
+                Loading preview...
+            </div>
+        </div>
+    </div>
+</div>
+
+<body>
+
+    <header class="top-bar">
+
+        <div class="logo">
+            <span class="logo-icon">☁</span>
+            <span>My Drive</span>
+        </div>
+
+        <div class="search-container">
+            <input
+                type="text"
+                id="search-input"
+                placeholder="Search files..."
+            >
+        </div>
+
+    </header>
+
+
+    <div class="app">
+
+        <aside class="sidebar">
+
+        <button id="new-folder-button" class="new-folder-button">
+            + New Folder
+        </button>
+
+        <button id="upload-button" class="upload-button">
+            ↑ Upload
+        </button>
+
+        <nav class="sidebar-nav">
+            <button id="home-button">🏠 Home</button>
+        </nav>
+
+        </aside>
+
+
+        <main class="main-content">
+
+            <div class="toolbar">
+
+                <div class="navigation">
+
+                    <button
+                        id="back-button"
+                        class="icon-button"
+                        title="Go back"
+                    >
+                        ←
+                    </button>
+
+                    <div id="breadcrumbs" class="breadcrumbs"></div>
+
+                </div>
+
+
+                <div class="view-controls">
+
+                    <select id="sort-select">
+                        <option value="name">Name</option>
+                        <option value="date">Last modified</option>
+                        <option value="size">Size</option>
+                    </select>
+
+                    <button id="grid-view-button" class="view-button active">
+                        ▦
+                    </button>
+
+                    <button id="list-view-button" class="view-button">
+                        ☰
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div id="loading" class="loading">
+                Loading...
+            </div>
+
+
+            <div id="file-container" class="file-grid"></div>
+
+
+            <div id="empty-message" class="empty-message hidden">
+                This folder is empty.
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- Hidden file input -->
+    <input
+        type="file"
+        id="file-input"
+        multiple
+        hidden
+    >
+
+
+    <div id="toast" class="toast"></div>
+
+</body>
+</html>

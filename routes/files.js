@@ -42,16 +42,25 @@ async function uniqueName(dir, name) {
 }
 
 const storage = multer.diskStorage({
-  async destination(req, file, cb){
-    try {
-      const dir = safePath(req.query.body);
-      const info = await fs.stat(dir);
-      if (!info.isDirectory()) throw new Error('Invalid path');
-      cb(null, dir); // saves here
-    } catch (error) {
-      cb(error)
-    }
-  },
+  async destination(req, file, cb) {
+
+        try {
+
+            const dir = safePath(req.query.path);
+
+            const info = await fs.stat(dir);
+
+            if (!info.isDirectory()) {
+                throw new Error("Invalid path");
+            }
+
+            cb(null, dir);
+
+        } catch (err) {
+
+            cb(err);
+        }
+    },
   async filename(req,file,cb){
     try {
       const dir = safePath(req.query.path);
@@ -73,10 +82,34 @@ router.post('/upload', upload.array('files'), (req,res) =>{
   res.status(201).json({upload: req.files.map((f) => f.filename)});
 })
 
+// GET preview files in browser
+router.get('/preview', async (req, res) => {
+  try {
+    const target = safePath(req.query.path);
+
+    const info = await fs.stat(target);
+
+    if (info.isDirectory()) {
+      return res.status(400).json({
+        error: 'Cannot preview a folder'
+      });
+    }
+
+    res.sendFile(target, (err) => {
+      if (err && !res.headersSent) {
+        handleError(err, res);
+      }
+    });
+
+  } catch (error) {
+    handleError(error, res);
+  }
+});
+
 // GET download files
 router.get('/download', async (req,res) =>{
   try {
-    const target = safePath(req.query.body);
+    const target = safePath(req.query.path);
     const info = await fs.stat(target);
     if (info.isDirectory()){
       return res.status(400).json({error: 'Canot download a folder'});
@@ -161,6 +194,6 @@ router.delete('/delete', async (req,res) => {
     } catch (error) {
         handleError(error,res);
     }
-})
+});
 
 export default router;
