@@ -1,148 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>My Drive</title>
-
-    <link rel="stylesheet" href="style.css">
-    <script src="app.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Drive</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
 </head>
-
-<!-- File Preview Modal -->
-<div id="preview-modal" class="preview-modal hidden">
-    <div class="preview-overlay"></div>
-
-    <div class="preview-window">
-        <div class="preview-header">
-            <div id="preview-title" class="preview-title"></div>
-
-            <div class="preview-actions">
-                <button id="preview-download" class="preview-button">
-                    ↓ Download
-                </button>
-
-                <button id="preview-close" class="preview-close">
-                    ×
-                </button>
-            </div>
-        </div>
-
-        <div id="preview-content" class="preview-content">
-            <div class="preview-loading">
-                Loading preview...
-            </div>
-        </div>
-    </div>
-</div>
-
 <body>
-
-    <header class="top-bar">
-
-        <div class="logo">
-            <span class="logo-icon">☁</span>
-            <span>My Drive</span>
-        </div>
-
-        <div class="search-container">
-            <input
-                type="text"
-                id="search-input"
-                placeholder="Search files..."
-            >
-        </div>
-
-    </header>
-
-
-    <div class="app">
-
-        <aside class="sidebar">
-
-        <button id="new-folder-button" class="new-folder-button">
-            + New Folder
-        </button>
-
-        <button id="upload-button" class="upload-button">
-            ↑ Upload
-        </button>
-
-        <nav class="sidebar-nav">
-            <button id="home-button">🏠 Home</button>
-        </nav>
-
-        </aside>
-
-
-        <main class="main-content">
-
-            <div class="toolbar">
-
-                <div class="navigation">
-
-                    <button
-                        id="back-button"
-                        class="icon-button"
-                        title="Go back"
-                    >
-                        ←
-                    </button>
-
-                    <div id="breadcrumbs" class="breadcrumbs"></div>
-
-                </div>
-
-
-                <div class="view-controls">
-
-                    <select id="sort-select">
-                        <option value="name">Name</option>
-                        <option value="date">Last modified</option>
-                        <option value="size">Size</option>
-                    </select>
-
-                    <button id="grid-view-button" class="view-button active">
-                        ▦
-                    </button>
-
-                    <button id="list-view-button" class="view-button">
-                        ☰
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            <div id="loading" class="loading">
-                Loading...
-            </div>
-
-
-            <div id="file-container" class="file-grid"></div>
-
-
-            <div id="empty-message" class="empty-message hidden">
-                This folder is empty.
-            </div>
-
-        </main>
-
+  <section id="auth-panel" class="auth-panel" aria-labelledby="auth-title">
+    <div class="auth-card">
+      <div class="logo"><span class="logo-icon" aria-hidden="true">☁</span><span>My Drive</span></div>
+      <h1 id="auth-title">Your files. Your space.</h1>
+      <p>Sign in to access your drive and files shared with you.</p>
+      <form id="auth-form">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="username" required maxlength="254">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" required minlength="6">
+        <button id="login-button" type="submit" class="primary" disabled>Log in</button>
+        <button id="register-button" type="button" disabled>Create account</button>
+      </form>
+      <p id="auth-error" class="form-error" role="alert"></p>
+      <p class="subtle">Files stay on the computer running this drive.</p>
     </div>
+  </section>
 
-
-    <!-- Hidden file input -->
-    <input
-        type="file"
-        id="file-input"
-        multiple
-        hidden
-    >
-
-
-    <div id="toast" class="toast"></div>
-
+  <div id="drive-panel" class="hidden">
+    <header class="top-bar">
+      <div class="logo"><span class="logo-icon" aria-hidden="true">☁</span><span>My Drive</span></div>
+      <div class="search-container"><input type="search" id="search-input" placeholder="Search loaded files…" aria-label="Search loaded files"></div>
+      <div class="account"><span id="account-email" dir="auto"></span><button id="verify-email-button" class="hidden">Verify email</button><button id="logout-button">Log out</button></div>
+    </header>
+    <div class="app">
+      <aside class="sidebar" aria-label="Drive navigation">
+        <button id="new-folder-button" class="new-folder-button">+ New folder</button>
+        <button id="upload-button" class="upload-button">↑ Upload</button>
+        <nav class="sidebar-nav">
+          <button id="home-button" class="active">⌂ My files</button>
+          <button id="shared-button">♧ Shared with me</button>
+        </nav>
+      </aside>
+      <main class="main-content" id="drop-zone">
+        <div class="toolbar">
+          <div class="navigation">
+            <button id="back-button" class="icon-button" aria-label="Go to parent folder">←</button>
+            <nav id="breadcrumbs" class="breadcrumbs" aria-label="Breadcrumb"></nav>
+          </div>
+          <div class="view-controls">
+            <select id="sort-select" aria-label="Sort files">
+              <option value="name">Name</option><option value="date">Last modified</option><option value="size">Size</option>
+            </select>
+            <button id="refresh-button" class="view-button" aria-label="Refresh folder">↻</button>
+            <button id="grid-view-button" class="view-button active" aria-label="Grid view" aria-pressed="true">▦</button>
+            <button id="list-view-button" class="view-button" aria-label="List view" aria-pressed="false">☰</button>
+          </div>
+        </div>
+        <p id="folder-hint" class="subtle"></p>
+        <div id="upload-status" class="upload-status hidden" role="status"><span id="upload-label"></span><progress id="upload-progress" max="100" value="0"></progress></div>
+        <div id="loading" class="loading hidden" role="status">Loading your files…</div>
+        <p id="folder-error" class="form-error" role="alert"></p>
+        <div id="file-container" class="file-grid"></div>
+        <div id="empty-message" class="empty-message hidden">This folder is empty. Upload a file or create a folder to get started.</div>
+        <button id="load-more" class="hidden">Load more files</button>
+      </main>
+    </div>
+  </div>
+  <input type="file" id="file-input" multiple hidden>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="preview-modal" class="preview-dialog" aria-labelledby="preview-title">
+    <div class="preview-header">
+      <h2 id="preview-title" class="preview-title" dir="auto"></h2>
+      <div class="preview-actions">
+        <button id="preview-download" class="preview-button">↓ Download</button>
+        <button id="preview-close" class="preview-close" aria-label="Close preview">×</button>
+      </div>
+    </div>
+    <div id="preview-content" class="preview-content"></div>
+  </dialog>
+  <dialog id="action-dialog" aria-labelledby="dialog-title">
+    <form id="action-form">
+      <h2 id="dialog-title"></h2>
+      <p id="dialog-description"></p>
+      <div id="dialog-fields"></div>
+      <p id="dialog-error" class="form-error" role="alert"></p>
+      <div class="dialog-actions"><button type="button" id="dialog-cancel">Cancel</button><button type="submit" class="primary" id="dialog-submit">Save</button></div>
+    </form>
+  </dialog>
 </body>
 </html>
