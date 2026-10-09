@@ -1,0 +1,17 @@
+{
+  "indexes": [
+    { "collectionGroup": "items", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "ownerId", "order": "ASCENDING" },
+      { "fieldPath": "parentId", "order": "ASCENDING" }
+    ] }
+  ],
+  "fieldOverrides": [
+    { "collectionGroup": "items", "fieldPath": "grants", "indexes": [] },
+    { "collectionGroup": "items", "fieldPath": "name", "indexes": [] },
+    { "collectionGroup": "items", "fieldPath": "mimeType", "indexes": [] },
+    { "collectionGroup": "items", "fieldPath": "storageId", "indexes": [] },
+    { "collectionGroup": "items", "fieldPath": "size", "indexes": [] },
+    { "collectionGroup": "items", "fieldPath": "created", "indexes": [] },
+    { "collectionGroup": "items", "fieldPath": "modified", "indexes": [] }
+  ]
+}
