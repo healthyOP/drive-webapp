@@ -31,4 +31,4 @@ app.use((err, req, res, next) =>{
     handleError(err,res);
 })
 
-app.listen(port, () => console.log(`server is runing on ${port}`)) ;
+app.listen(port,'0.0.0.0', () => console.log(`server is runing on ${port}`)) ;
